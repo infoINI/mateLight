@@ -25,7 +25,7 @@ namespace mateLight {
       Allocator(std::size_t size, std::uint8_t alignment = 32);
 
       template <typename T>
-      Ptr<T> allocate(std::size_t count = 1);
+      Ptr<T> alloc(std::size_t count = 1);
 
       template <typename T>
       void free(Ptr<T> p);
@@ -42,6 +42,7 @@ namespace mateLight {
       std::size_t elementCount;
 
     public:
+      inline Info();
       inline Info(std::uint8_t* ptr, std::size_t elementSize, std::size_t elementCount = 1);
       inline Info(const Info& info);
 
@@ -53,16 +54,23 @@ namespace mateLight {
 
   template <typename T>
   class Allocator::Ptr {
+      friend class Allocator;
     protected:
       Allocator* parent;
       std::size_t id;
 
     public:
+      Ptr();
       Ptr(Allocator* parent, std::size_t id);
       Ptr(const Ptr& ptr);
+
+      T* get() const;
+
       T* operator->();
       T& operator[](int idx);
       const T& operator[](int idx) const;
+
+      operator bool() const;
   };
 
   template <typename T>
@@ -73,7 +81,7 @@ namespace mateLight {
     for(std::pair<const std::size_t, Info>& p : addressMap) {
       // check size of free memory
       if(p.second.getPtr() - pos > size) {
-        std::size_t id = idCounter++;
+        std::size_t id = ++idCounter;
         addressMap[id] = Allocator::Info(pos, sizeof(T), count);
         return Allocator::Ptr<T>(this, id);
       }
@@ -82,14 +90,20 @@ namespace mateLight {
       pos = p.second.getPtr() + p.second.getSize();
 
       // move to next aligned pointer address
-      pos += (alignment - (pos % alignment));
+      pos += (alignment - ((pos - data.get()) % alignment));
     }
 
-    return nullptr;
+    if(this->size - (pos - data.get()) > size) {
+      std::size_t id = ++idCounter;
+      addressMap[id] = Allocator::Info(pos, sizeof(T), count);
+      return Allocator::Ptr<T>(this, id);
+    }
+
+    return Allocator::Ptr<T>();
   }
 
   template <typename T>
-  void Allocator<T>::Allocator::free(Allocator::Ptr<T> p) {
+  void Allocator::free(Allocator::Ptr<T> p) {
     addressMap.erase(addressMap.find(p.id));
   }
 
@@ -104,8 +118,15 @@ namespace mateLight {
       throw std::runtime_error("Index out of bounds");
     }
 
-    return (static_cast<T*>(info.getPtr()) + idx);
+    T* p = (T*)info.getPtr();
+    return (p + idx);
   }
+
+  inline Allocator::Info::Info() 
+    : ptr(nullptr),
+      elementSize(0),
+      elementCount(0)
+  {}
 
   inline Allocator::Info::Info(std::uint8_t* ptr, std::size_t elementSize, std::size_t elementCount)
     : ptr(ptr),
@@ -136,6 +157,12 @@ namespace mateLight {
   }
 
   template <typename T>
+  Allocator::Ptr<T>::Ptr()
+    : parent(nullptr),
+      id(0)
+  {}
+
+  template <typename T>
   Allocator::Ptr<T>::Ptr(Allocator* parent, std::size_t id)
     : parent(parent),
       id(id)
@@ -147,9 +174,21 @@ namespace mateLight {
       id(ptr.id)
   {}
 
+  template<typename T>
+  T* Allocator::Ptr<T>::get() const {
+    T* p = parent->getPtr<T>(id);
+
+    if(!p) {
+      throw std::runtime_error("invalid pointer");
+    }
+  
+    return p;  
+  }
+
   template <typename T>
   T* Allocator::Ptr<T>::operator->() {
     T* p = parent->getPtr<T>(id);
+
     if(!p) {
       throw std::runtime_error("invalid pointer");
     }
@@ -157,8 +196,10 @@ namespace mateLight {
     return p;
   }
 
+  template <typename T>
   T& Allocator::Ptr<T>::operator[](int idx) {
     T* p = parent->getPtr<T>(id, idx);
+
     if(!p) {
       throw std::runtime_error("invalid pointer");
     }
@@ -166,13 +207,20 @@ namespace mateLight {
     return *p;
   }
 
+  template <typename T>
   const T& Allocator::Ptr<T>::operator[](int idx) const {
     T* p = parent->getPtr<T>(id, idx);
+
     if(!p) {
       throw std::runtime_error("invalid pointer");
     }
 
     return *p;
+  }
+
+  template <typename T>
+  Allocator::Ptr<T>::operator bool() const {
+    return parent->getPtr<T>(id);
   }
 }
 
