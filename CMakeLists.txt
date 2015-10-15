@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 2.6)
+
+project(mateLight)
+
 string(COMPARE EQUAL ${CMAKE_CXX_COMPILER_ID} "Clang" is_clang)
 if(is_clang)
     SET(CMAKE_CXX_FLAGS "-std=c++11 -Wno-deprecated-register")
@@ -10,11 +14,6 @@ if(is_gnu)
     message(STATUS "GNU compiler")
 endif(is_gnu)
 
-ADD_LIBRARY(
-  ml STATIC 
-
-  allocator.cpp
-  frame.cpp
-  ringbuffer.cpp
-)
+add_subdirectory(lib)
+add_subdirectory(test)
 
