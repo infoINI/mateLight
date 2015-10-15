@@ -62,18 +62,51 @@ int main()
                draw(colarr[i],rowarr[j],100,k);
             }
          }
-      }*//*
+      }*/
    for(k = 7; k <= 9; k++)
    {
-      marquee(I,k,1000);
-      marquee(N,k,1000);
+      marquee(A,k,1000);
+      marquee(B,k,1000);
+      marquee(C,k,1000);
+      marquee(D,k,1000);
+      marquee(E,k,1000);
       marquee(F,k,1000);
-      marquee(O,k,1000);
+      marquee(G,k,1000);
+      marquee(H,k,1000);
       marquee(I,k,1000);
+      marquee(J,k,1000);
+      marquee(K,k,1000);
+      marquee(L,k,1000);
+      marquee(M,k,1000);
       marquee(N,k,1000);
-      marquee(I,k,1000);
-   }*/
-      drawMulti(colarr[0],rowarr[0],1,0,5,2);
+      marquee(O,k,1000);
+      marquee(P,k,1000);
+      marquee(Q,k,1000);
+      marquee(R,k,1000);
+      marquee(S,k,1000);
+      marquee(T,k,1000);
+      marquee(U,k,1000);
+      marquee(V,k,1000);
+      marquee(W,k,1000);
+      marquee(X,k,1000);
+      marquee(Y,k,1000);
+      marquee(Z,k,1000);
+      marquee(n0,k,1000);
+      marquee(n1,k,1000);
+      marquee(n2,k,1000);
+      marquee(n3,k,1000);
+      marquee(n4,k,1000);
+      marquee(n5,k,1000);
+      marquee(n6,k,1000);
+      marquee(n7,k,1000);
+      marquee(n8,k,1000);
+      marquee(n9,k,1000);
+      marquee(question,k,1000);
+      marquee(exclamation,k,1000);
+      marquee(percent,k,1000);
+      marquee(dot,k,1000);
+   }
+    /*  drawMulti(colarr[0],rowarr[0],1,0,5,2);*/
    }
    return 0;
 }
