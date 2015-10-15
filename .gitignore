@@ -1,0 +1,11 @@
+*.o
+*.a
+CMakeCache.txt
+CMakeFiles/*
+*/CMakeFiles/*
+mateLight.creator*
+mateLight.files
+mateLight.includes
+mateLight.config
+Makefile
+cmake_install.cmake
