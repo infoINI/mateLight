@@ -65,10 +65,11 @@ namespace mateLight {
       Ptr(const Ptr& ptr);
 
       T* get() const;
+      T* getPtrOf(std::uint32_t idx) const;
 
       T* operator->();
-      T& operator[](int idx);
-      const T& operator[](int idx) const;
+      T& operator[](std::uint32_t idx);
+      const T& operator[](std::uint32_t idx) const;
 
       operator bool() const;
   };
@@ -174,7 +175,7 @@ namespace mateLight {
       id(ptr.id)
   {}
 
-  template<typename T>
+  template <typename T>
   T* Allocator::Ptr<T>::get() const {
     T* p = parent->getPtr<T>(id);
 
@@ -183,6 +184,17 @@ namespace mateLight {
     }
   
     return p;  
+  }
+
+  template <typename T>
+  T* Allocator::Ptr<T>::getPtrOf(std::uint32_t idx) const {
+    T* p = parent->getPtr<T>(id, idx);
+
+    if(!p) {
+      throw std::runtime_error("invalid pointer");
+    }
+
+    return p;
   }
 
   template <typename T>
@@ -197,7 +209,7 @@ namespace mateLight {
   }
 
   template <typename T>
-  T& Allocator::Ptr<T>::operator[](int idx) {
+  T& Allocator::Ptr<T>::operator[](std::uint32_t idx) {
     T* p = parent->getPtr<T>(id, idx);
 
     if(!p) {
@@ -208,7 +220,7 @@ namespace mateLight {
   }
 
   template <typename T>
-  const T& Allocator::Ptr<T>::operator[](int idx) const {
+  const T& Allocator::Ptr<T>::operator[](std::uint32_t idx) const {
     T* p = parent->getPtr<T>(id, idx);
 
     if(!p) {

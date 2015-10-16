@@ -20,6 +20,7 @@ namespace mateLight {
     public:
       inline Frame(Allocator* allocator, std::uint8_t columnCount, std::uint8_t rowCount, std::uint32_t displayTime);
       inline Frame(const Frame& f);
+      virtual inline ~Frame();
 
       inline void setDisplayTime(std::uint32_t displayTime);
 
@@ -63,6 +64,13 @@ namespace mateLight {
   inline void Frame::reset() {
     for(int i=0; pixel && i<columnCount*rowCount;++i) {
       pixel[i].reset();
+    }
+  }
+
+  inline Frame::~Frame() {
+    if(allocator && pixel) {
+      allocator->free(pixel);
+      pixel = Allocator::Ptr<Color>();
     }
   }
 }
